@@ -1,0 +1,71 @@
+version: "1.0"
+
+# Core configuration for the annotation interface
+config:
+  title: string  # Title of the annotation task
+  description: string  # Description shown to annotators
+  version: string  # Version of the interface
+
+# Input data specification
+input:
+  type: "single_image"
+  iterator:
+    type: "url_pattern"  # Can be "url_pattern", "number_sequence", "string_list", etc.
+    config:
+      base_url: string  # Base URL for images
+      pattern: string  # Pattern for image URLs with placeholders
+      sequence:
+        type: "number_range"  # Type of sequence to iterate over
+        start: integer  # Starting value (for number sequences)
+        end: integer    # Ending value (for number sequences)
+        values: array   # Optional: explicit list of values to iterate over
+      randomize: boolean  # Whether to randomize the sequence
+    variables:
+      image_source: string  # Variables to substitute in pattern
+      concept: string
+      country: string
+
+# Display configuration
+display:
+  type: "single_image"  # Type of display (single_image, dual_image, etc.)
+  config:
+    image_size: string  # CSS size for the image (e.g., "max-width: 500px")
+    image_position: string  # Where to show the image ("top" or "bottom" of questions)
+    container_width: string  # Width of the main container (e.g., "800px")
+    background_color: string  # Background color of the container
+
+# Questions/annotations to be collected
+questions:
+  type: array
+  items:
+    type: object
+    properties:
+      id: string  # Unique identifier for the question
+      type: string  # Type of question (rating for single-image)
+      text: string  # Question text
+      required: boolean  # Whether the question is required
+      config:
+        display_type: string  # Type of display: "slider", "checklist", or "scantron"
+        min: integer  # Minimum rating value
+        max: integer  # Maximum rating value
+        step: integer  # Step size for rating
+        show_labels: boolean  # Whether to show labels (for scantron)
+        labels:  # Optional labels for rating values
+          type: array
+          items: string
+
+# Layout configuration
+layout:
+  type: "single_page"  # All questions shown on one page
+  config:
+    question_spacing: string  # CSS spacing between questions
+
+# Output configuration
+output:
+  format: "csv"
+  fields:
+    - "image_id"
+    - "question_id"
+    - "rating"
+    - "timestamp"
+    - "annotator_id" 

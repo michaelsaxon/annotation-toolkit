@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Annotation Form</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: sans-serif;
+        }
+
+        .image-grid {
+            max-width: 1000px;
+            min-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .image-item {
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none; /* Hide all items by default */
+            margin: 0 auto;
+            min-width: 500px;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        .image-item.active {
+            display: block; /* Show only active item */
+        }
+        .image-item img {
+            max-width: 100%;
+            min-width: 500px;
+            max-height: 600px; /* Set a reasonable max height */
+            height: auto;
+            border-radius: 5px;
+            object-fit: contain;
+        }
+        .image-title {
+            font-size: 1.1em;
+            margin: 10px 0;
+            color: #005581;
+            font-weight: 500;
+        }
+        .radio-group {
+            margin-bottom: 20px; /* Increased margin */
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Increased gap between radio buttons */
+            opacity: 1; /* Changed from 0 to show by default */
+            transition: opacity 0.5s ease;
+        }
+        .radio-group.show {
+            opacity: 1;
+        }
+        .radio-option {
+            display: inline-block;
+        }
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+        .radio-option label {
+            width: 40px; /* Made radio buttons larger */
+            height: 40px;
+            line-height: 40px;
+            font-size: 1.2em;
+            display: inline-block;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .radio-option input[type="radio"]:checked + label {
+            background-color: #1295D8;
+            border-color: #1295D8;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .submit-button {
+            text-align: center;
+            margin: 20px;
+        }
+        .submit-button button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin: 0 10px;
+        }
+        .submit-button button[type="submit"] {
+            background-color: #1295D8;
+            color: white;
+        }
+        .submit-button button[type="button"] {
+            background-color: #FFB511;
+            color: white;
+        }
+        .submit-button button:hover {
+            opacity: 0.9;
+        }
+        .submit-button button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        body {
+            background-color: #f5f5f5;
+        }
+        .instructions {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .examples {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .example-item {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-width: 150px;  /* Ensure example boxes don't get too narrow */
+        }
+        
+        .example-label {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .example-radio-group {
+            margin: 10px 0;
+            pointer-events: none;
+            gap: 8px;  /* Smaller gap for example buttons */
+            opacity: 1;
+            transition: none;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #005581;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #1295D8;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .example-radio-group .radio-option label {
+            width: 25px;  /* Smaller than the main radio buttons */
+            height: 25px;
+            line-height: 25px;
+            font-size: 0.9em;
+            transition: none;
+        }
+
+        /* Animation for the selected radio button */
+        .radio-option input[type="radio"]:checked + label {
+            background-color: #1295D8;
+            border-color: #1295D8;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        /* Prevent clicking during transitions */
+        .transitioning {
+            pointer-events: none;
+        }
+
+        .image-item.fade-out {
+            opacity: 0;
+        }
+
+        /* Container for image and its radio group */
+        .content-container {
+            opacity: 1;
+            transition: opacity 0.5s ease-in; /* Only fade in */
+        }
+
+        .content-container.fade-out {
+            opacity: 0;
+            transition: none; /* No transition for disappearing */
+        }
+
+        .completion-card {
+            display: none;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .completion-card.show {
+            display: block;
+        }
+
+        .completion-code {
+            font-family: monospace;
+            font-size: 2.5em;
+            margin: 20px;
+            padding: 15px 30px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            display: inline-block;
+            border: 1px solid #ddd;
+            letter-spacing: 2px;
+        }
+
+        /* Update any hover states */
+        .radio-option label:hover {
+            border-color: #1295D8;
+        }
+
+        /* Update the example radio buttons to match */
+        .example-radio-group .radio-option input[type="radio"]:checked + label {
+            background-color: #1295D8;
+            border-color: #1295D8;
+        }
+
+        /* Update completion card title */
+        .completion-card h2 {
+            color: #005581;
+        }
+
+        /* Update navigation button styles */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0 20px;
+        }
+
+        .nav-button {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            font-size: 1em;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background-color: #1295D8;
+            color: white;
+            transition: opacity 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .nav-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .progress-text-container {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .progress-text {
+            min-width: 100px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h1>Image Cultural Relevance Rating</h1>
+        <p>Please rate each image based on how applicable it is to your culture using the scale below:</p>
+        
+        <div class="examples">
+            <div class="example-item">
+                <div class="radio-group example-radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="example_1_1" name="example_1" checked>
+                        <label for="example_1_1">1</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_1_2" name="example_1">
+                        <label for="example_1_2">2</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_1_3" name="example_1">
+                        <label for="example_1_3">3</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_1_4" name="example_1">
+                        <label for="example_1_4">4</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_1_5" name="example_1">
+                        <label for="example_1_5">5</label>
+                    </div>
+                </div>
+                <div class="example-label">Not applicable at all to my culture</div>
+            </div>
+            
+            <div class="example-item">
+                <div class="radio-group example-radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="example_2_1" name="example_2">
+                        <label for="example_2_1">1</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_2_2" name="example_2">
+                        <label for="example_2_2">2</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_2_3" name="example_2" checked>
+                        <label for="example_2_3">3</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_2_4" name="example_2">
+                        <label for="example_2_4">4</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_2_5" name="example_2">
+                        <label for="example_2_5">5</label>
+                    </div>
+                </div>
+                <div class="example-label">Somewhat applicable to my culture</div>
+            </div>
+            
+            <div class="example-item">
+                <div class="radio-group example-radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="example_3_1" name="example_3">
+                        <label for="example_3_1">1</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_3_2" name="example_3">
+                        <label for="example_3_2">2</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_3_3" name="example_3">
+                        <label for="example_3_3">3</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_3_4" name="example_3">
+                        <label for="example_3_4">4</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="example_3_5" name="example_3" checked>
+                        <label for="example_3_5">5</label>
+                    </div>
+                </div>
+                <div class="example-label">Most applicable to my culture</div>
+            </div>
+        </div>
+
+        <div style="margin: 20px 0; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+            <p style="margin-bottom: 10px;"><strong>Rating Scale Details:</strong></p>
+            <p><strong>1 -- Not Relevant:</strong> The content does not connect with or reflect the target culture at all.</p>
+            <p><strong>2 -- Minimally Relevant:</strong> The content shows slight or superficial connections to the culture but lacks depth. May include vague references or isolated cultural elements that feel out of place or underdeveloped.</p>
+            <p><strong>3 -- Somewhat Relevant:</strong> The content contains identifiable cultural references, but they may feel generic, inconsistent, or limited in scope. The connection to the culture is present but could be stronger or more meaningful.</p>
+            <p><strong>4 -- Relevant:</strong> The content reflects a reasonable understanding of the culture, including accurate and appropriate references. It integrates cultural aspects well, though there may still be areas where more depth could be added.</p>
+            <p><strong>5 -- Highly Relevant:</strong> The content is deeply connected to the target culture, showing an immersive, accurate, and respectful understanding. Cultural references feel natural, meaningful, and central to the content.</p>
+        </div>
+    </div>
+
+    <form id="annotationForm">
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text-container">
+            <button type="button" id="prevButton" class="nav-button" disabled>←</button>
+            <div class="progress-text"></div>
+            <button type="button" id="nextButton" class="nav-button" disabled>→</button>
+        </div>
+
+        <div class="submit-button">
+            <button type="submit" disabled></button>
+            <button type="button" id="resetButton">Reset Form</button>
+        </div>
+
+        <div class="image-grid"></div>
+    </form>
+
+    <div class="completion-card" id="completionCard">
+        <h2>Thank you for completing!</h2>
+        <p>Please paste this password in the google form:</p>
+        <div class="completion-code">5f37</div>
+    </div>
+
+    <script>
+        const CONCEPTS = ['breakfast', 'clothing', 'dance', 'dessert', 'dinner', 'drinks', 'eating habits', 
+        'farming', 'festival', 'funeral', 'greetings', 'head coverings', 'instrument', 'lunch', 'marriage', 'music',
+        'religion', 'sport', 'transport'];
+        const COUNTRIES = ['China', 'India', 'United States', 'Brazil', 'Nigeria', 'Russia', 'Mexico', 'Egypt', 'Germany', 'Indonesia']
+        
+        // Function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Parse URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const imageSource = urlParams.get('source') || 'FLUX-country';
+            const annotatorCountry = urlParams.get('country') || 'XX';  // New parameter
+            
+            // Calculate total images
+            const totalImages = CONCEPTS.length * COUNTRIES.length;
+
+            // Initialize form elements
+            const form = document.getElementById('annotationForm');
+            const submitButton = form.querySelector('button[type="submit"]');
+            const progressFill = document.querySelector('.progress-fill');
+            const progressText = document.querySelector('.progress-text');
+            let currentImage = 0;
+
+            // Set initial text
+            progressText.textContent = `Image 1 of ${totalImages}`;
+            submitButton.textContent = `Submit Annotations (0/${totalImages} completed)`;
+
+            // Shuffle concepts and prepare shuffled countries for each concept
+            const shuffledConcepts = shuffleArray([...CONCEPTS]);
+            const conceptCountryOrder = {};
+            shuffledConcepts.forEach(concept => {
+                conceptCountryOrder[concept] = shuffleArray([...COUNTRIES]);
+            });
+
+            // Initialize form content
+            let html = '';
+            shuffledConcepts.forEach((concept, conceptIndex) => {
+                conceptCountryOrder[concept].forEach((country, countryIndex) => {
+                    const imageUrl = `https://storage.googleapis.com/image-cultural-evaluation/${imageSource}/${concept}/${country}/image_0.jpg`;
+                    const isFirst = conceptIndex === 0 && countryIndex === 0;
+                    const globalIndex = (conceptIndex * COUNTRIES.length) + countryIndex;
+                    
+                    html += `
+                        <div class="image-item ${isFirst ? 'active' : ''}" data-index="${globalIndex}">
+                            <div class="image-title">${concept}</div>
+                            <div class="content-container">
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="rating_${concept}_${country}_1" name="rating_${concept}_${country}" value="1" required>
+                                        <label for="rating_${concept}_${country}_1">1</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="rating_${concept}_${country}_2" name="rating_${concept}_${country}" value="2">
+                                        <label for="rating_${concept}_${country}_2">2</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="rating_${concept}_${country}_3" name="rating_${concept}_${country}" value="3">
+                                        <label for="rating_${concept}_${country}_3">3</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="rating_${concept}_${country}_4" name="rating_${concept}_${country}" value="4">
+                                        <label for="rating_${concept}_${country}_4">4</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="rating_${concept}_${country}_5" name="rating_${concept}_${country}" value="5">
+                                        <label for="rating_${concept}_${country}_5">5</label>
+                                    </div>
+                                </div>
+                                <img src="${imageUrl}" alt="${concept}">
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            document.querySelector('.image-grid').innerHTML = html;
+
+            // Function to update progress
+            function updateProgress() {
+                const completed = document.querySelector('.image-grid')
+                    .querySelectorAll('input[type="radio"]:checked').length;
+                
+                const percentage = (completed / totalImages) * 100;
+                progressFill.style.width = percentage + '%';
+                submitButton.textContent = `Submit Annotations (${completed}/${totalImages} completed)`;
+                progressText.textContent = `Image ${currentImage + 1} of ${totalImages}`;
+                
+                if (completed === totalImages) {
+                    submitButton.disabled = false;
+                } else {
+                    submitButton.disabled = true;
+                }
+            }
+
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            let maxImageReached = 0;
+
+            // Function to update navigation buttons
+            function updateNavigationButtons() {
+                prevButton.disabled = currentImage <= 0;
+                nextButton.disabled = currentImage >= maxImageReached || currentImage >= totalImages - 1;
+            }
+
+            // Modified showNextImage function
+            function showNextImage() {
+                const currentItem = document.querySelector('.image-item.active');
+                const nextItem = document.querySelector(`.image-item[data-index="${currentImage + 1}"]`);
+                
+                if (nextItem) {
+                    document.body.classList.add('transitioning');
+                    setTimeout(() => {
+                        currentItem.classList.remove('active');
+                        nextItem.classList.add('active');
+                        const nextContainer = nextItem.querySelector('.content-container');
+                        nextContainer.classList.add('fade-out');
+                        
+                        void nextContainer.offsetWidth;
+                        
+                        nextContainer.classList.remove('fade-out');
+                        document.body.classList.remove('transitioning');
+                        
+                        currentImage++;
+                        maxImageReached = Math.max(maxImageReached, currentImage);
+                        updateNavigationButtons();
+                        updateProgress();
+                    }, 100);
+                }
+            }
+
+            // Add showPreviousImage function
+            function showPreviousImage() {
+                const currentItem = document.querySelector('.image-item.active');
+                const prevItem = document.querySelector(`.image-item[data-index="${currentImage - 1}"]`);
+                
+                if (prevItem) {
+                    document.body.classList.add('transitioning');
+                    setTimeout(() => {
+                        currentItem.classList.remove('active');
+                        prevItem.classList.add('active');
+                        const prevContainer = prevItem.querySelector('.content-container');
+                        prevContainer.classList.add('fade-out');
+                        
+                        void prevContainer.offsetWidth;
+                        
+                        prevContainer.classList.remove('fade-out');
+                        document.body.classList.remove('transitioning');
+                        
+                        currentImage--;
+                        updateNavigationButtons();
+                        updateProgress();
+                    }, 100);
+                }
+            }
+
+            // Add navigation button event listeners
+            prevButton.addEventListener('click', showPreviousImage);
+            nextButton.addEventListener('click', () => {
+                const nextRadio = document.querySelector(`.image-item[data-index="${currentImage}"] input[type="radio"]:checked`);
+                if (nextRadio) {
+                    showNextImage();
+                }
+            });
+
+            // Modify radio change handler
+            document.querySelectorAll('.image-grid input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    maxImageReached = Math.max(maxImageReached, currentImage);
+                    updateNavigationButtons();
+                    setTimeout(showNextImage, 100);
+                    updateProgress();
+                });
+            });
+
+            // Modify reset button handler
+            document.getElementById('resetButton').addEventListener('click', function() {
+                form.reset();
+                
+                const currentItem = document.querySelector('.image-item.active');
+                const firstItem = document.querySelector('.image-item[data-index="0"]');
+                
+                const currentContainer = currentItem.querySelector('.content-container');
+                currentContainer.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.image-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    firstItem.classList.add('active');
+                    const firstContainer = firstItem.querySelector('.content-container');
+                    firstContainer.classList.add('fade-out');
+                    
+                    void firstContainer.offsetWidth;
+                    
+                    firstContainer.classList.remove('fade-out');
+                }, 500);
+                
+                currentImage = 0;
+                maxImageReached = 0;
+                updateNavigationButtons();
+                updateProgress();
+            });
+
+            // Initial button state
+            updateNavigationButtons();
+
+            // Form submission handler
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const ratings = {};
+                document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+                    ratings[radio.name] = radio.value;
+                });
+
+                const submitData = {
+                    ratings: ratings,
+                    image_source: imageSource,
+                    annotator_country: annotatorCountry
+                };
+
+                try {
+                    const response = await fetch('http://localhost:5000/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(submitData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        form.style.display = 'none';
+                        document.getElementById('completionCard').classList.add('show');
+                        document.querySelector('.completion-code').textContent = data.completion_code;
+                    } else {
+                        alert('Error submitting ratings. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error submitting ratings. Please try again.');
+                }
+            });
+
+            // Initial progress update
+            updateProgress();
+        });
+    </script>
+</body>
+</html> 

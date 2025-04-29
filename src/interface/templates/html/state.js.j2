@@ -1,0 +1,158 @@
+// State management
+const state = {
+    currentIndex: 0,
+    answers: {},
+    totalItems: 0
+};
+
+// Iterator lists - these will be populated from the YAML config
+const ITERATORS = {
+    {% for name, iterator in input.iterator.config.iterators.items() %}
+    {{ name }}: {{ iterator.values | tojson }},
+    {% endfor %}
+};
+
+// Initialize the state
+function initializeState() {
+    // Calculate total combinations
+    state.totalItems = Object.values(ITERATORS).reduce((acc, curr) => acc * curr.length, 1);
+    
+    // Generate all HTML content
+    generateAllContent();
+}
+
+// Generate all content
+function generateAllContent() {
+    let html = '';
+    let currentIndex = 0;
+    
+    // Generate all combinations using nested loops
+    {% for name, iterator in input.iterator.config.iterators.items() %}
+    {% if loop.first %}
+    ITERATORS.{{ name }}.forEach(({{ name }}, {{ name }}Index) => {
+    {% else %}
+    ITERATORS.{{ name }}.forEach(({{ name }}, {{ name }}Index) => {
+    {% endif %}
+    {% endfor %}
+        const isFirst = currentIndex === 0;
+        
+        html += `
+            <div class="image-item ${isFirst ? 'active' : ''}" data-index="${currentIndex}">
+                <div class="image-title">
+                    {% for name, iterator in input.iterator.config.iterators.items() %}
+                    {{ "{{" }} {{ name }} {{ "}}" }}{% if not loop.last %} - {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="content-container">
+                    <img src="${generateImageUrl({% for name, iterator in input.iterator.config.iterators.items() %}{{ name }}{% if not loop.last %}, {% endif %}{% endfor %})}" 
+                         alt="{% for name, iterator in input.iterator.config.iterators.items() %}{{ "{{" }} {{ name }} {{ "}}" }}{% if not loop.last %} in {% endif %}{% endfor %}">
+                    <div class="questions-container">
+                        ${QUESTIONS.map(question => {
+                            const questionText = question.text
+                                {% for name, iterator in input.iterator.config.iterators.items() %}
+                                .replace('{ {{ name }} }', {{ name }})
+                                {% endfor %};
+                            
+                            let questionHtml = `
+                                <div class="question-container">
+                                    <div class="question-text">${questionText}</div>
+                            `;
+                            
+                            if (question.config.display_type === 'scantron') {
+                                questionHtml += `
+                                    <div class="radio-group">
+                                        ${Array.from({length: question.config.max - question.config.min + 1}, (_, i) => {
+                                            const value = i + question.config.min;
+                                            const label = question.config.labels ? question.config.labels[i] : value;
+                                            return `
+                                                <div class="radio-option">
+                                                    <input type="radio" 
+                                                           id="rating_${question.id}_{% for name, iterator in input.iterator.config.iterators.items() %}{{ name }}_{% endfor %}${value}" 
+                                                           name="rating_${question.id}_{% for name, iterator in input.iterator.config.iterators.items() %}{{ name }}_{% endfor %}" 
+                                                           value="${value}" 
+                                                           ${question.required ? 'required' : ''}>
+                                                    <label for="rating_${question.id}_{% for name, iterator in input.iterator.config.iterators.items() %}{{ name }}_{% endfor %}${value}">${label}</label>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                `;
+                            }
+                            
+                            questionHtml += `</div>`;
+                            return questionHtml;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        currentIndex++;
+    {% for name, iterator in input.iterator.config.iterators.items() %}
+    });
+    {% endfor %}
+    
+    document.querySelector('.image-grid').innerHTML = html;
+    
+    // Add event listeners to radio buttons
+    document.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', () => {
+            const [_, questionId, {% for name, iterator in input.iterator.config.iterators.items() %}{{ name }}, {% endfor %}value] = input.id.split('_');
+            state.answers[`${questionId}_{% for name, iterator in input.iterator.config.iterators.items() %}{{ name }}_{% endfor %}`] = {
+                value: parseInt(value),
+                {% for name, iterator in input.iterator.config.iterators.items() %}
+                {{ name }}: {{ name }},
+                {% endfor %}
+                timestamp: new Date().toISOString()
+            };
+            updateProgress();
+        });
+    });
+}
+
+// Navigation functions
+function showImage(index) {
+    document.querySelectorAll('.image-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector(`.image-item[data-index="${index}"]`).classList.add('active');
+    state.currentIndex = index;
+    updateNavigationButtons();
+    updateProgress();
+}
+
+function updateNavigationButtons() {
+    document.getElementById('prev-button').disabled = state.currentIndex === 0;
+    document.getElementById('next-button').disabled = state.currentIndex === state.totalItems - 1;
+    document.querySelector('#progress-text').textContent = 
+        `Image ${state.currentIndex + 1} of ${state.totalItems}`;
+}
+
+function updateProgress() {
+    const completed = Object.keys(state.answers).length;
+    const totalExpectedAnswers = QUESTIONS.length * state.totalItems;
+    
+    const percentage = (completed / totalExpectedAnswers) * 100;
+    document.querySelector('.progress-fill').style.width = `${percentage}%`;
+    document.querySelector('button[type="submit"]').textContent = 
+        `Submit All Ratings (${completed}/${totalExpectedAnswers} completed)`;
+    
+    document.querySelector('button[type="submit"]').disabled = 
+        completed < totalExpectedAnswers;
+}
+
+// URL generation function
+function generateImageUrl(...args) {
+    let url = CONFIG.pattern;
+    const iteratorNames = Object.keys(ITERATORS);
+    
+    // Replace each iterator placeholder in the pattern
+    iteratorNames.forEach((name, index) => {
+        url = url.replace(`{${name}}`, args[index]);
+    });
+    
+    // Replace any remaining placeholders
+    url = url.replace('{base_url}', CONFIG.baseUrl);
+    url = url.replace('{image_source}', CONFIG.imageSource);
+    
+    return url;
+} 

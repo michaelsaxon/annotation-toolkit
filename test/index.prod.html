@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cultural Relevance Rating</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            margin: 0;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-container.loading {
+            opacity: 0.5;
+        }
+
+        .image-container img {
+            max-width: 600px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .questions-container {
+            margin: 20px 0;
+        }
+
+        .question-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .navigation-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+
+        .nav-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #eee;
+            margin: 10px 0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .submit-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #progress-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .error-message {
+            color: #ff0000;
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Cultural Relevance Rating</h1>
+            <p>Please rate how relevant each image is to the specified culture and concept.</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <form id="annotation-form">
+            
+            <div class="image-container">
+                <img id="current-image" alt="Image to rate">
+            </div>
+            
+
+            <div class="questions-container">
+                
+                    <div class="question-container">
+                        <div class="question-text"></div>
+                        
+                            <div class="question-container" data-question-id="cultural_relevance">
+    <h3>How relevant is this image of {concept} to {country}?</h3>
+    <div class="radio-group with-labels">
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_relevance-1"
+                       name="rating-cultural_relevance" 
+                       value="1"
+                       required>
+                <label for="rating-cultural_relevance-1">1</label>
+            </div>
+            
+            <div class="button-label">Not relevant at all</div>
+            
+        </div>
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_relevance-2"
+                       name="rating-cultural_relevance" 
+                       value="2"
+                       required>
+                <label for="rating-cultural_relevance-2">2</label>
+            </div>
+            
+            <div class="button-label">Minimally relevant</div>
+            
+        </div>
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_relevance-3"
+                       name="rating-cultural_relevance" 
+                       value="3"
+                       required>
+                <label for="rating-cultural_relevance-3">3</label>
+            </div>
+            
+            <div class="button-label">Somewhat relevant</div>
+            
+        </div>
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_relevance-4"
+                       name="rating-cultural_relevance" 
+                       value="4"
+                       required>
+                <label for="rating-cultural_relevance-4">4</label>
+            </div>
+            
+            <div class="button-label">Relevant</div>
+            
+        </div>
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_relevance-5"
+                       name="rating-cultural_relevance" 
+                       value="5"
+                       required>
+                <label for="rating-cultural_relevance-5">5</label>
+            </div>
+            
+            <div class="button-label">Highly relevant</div>
+            
+        </div>
+        
+    </div>
+</div>
+
+<style>
+    .radio-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;  /* Default gap for unlabeled buttons */
+        margin: 20px 0;
+    }
+
+    .radio-group.with-labels {
+        gap: 40px;  /* Increased gap when labels are present */
+    }
+
+    .radio-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .radio-option input[type="radio"] {
+        display: none;
+    }
+
+    .radio-option label {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 1.2em;
+        display: inline-block;
+        border: 2px solid #ddd;
+        border-radius: 50%;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+
+    .radio-option input[type="radio"]:checked + label {
+        background-color: #1295D8;
+        border-color: #1295D8;
+        color: white;
+    }
+
+    .radio-option label:hover {
+        background-color: #f0f0f0;
+    }
+
+    .button-label {
+        font-size: 0.9em;
+        color: #666;
+        text-align: center;
+        max-width: 80px;  /* Prevent super long labels from disrupting layout */
+        word-wrap: break-word;
+    }
+</style> 
+                        
+                    </div>
+                
+                    <div class="question-container">
+                        <div class="question-text"></div>
+                        
+                            <div class="question-container" data-question-id="cultural_accuracy">
+    <h3>How accurately does this depiction of {concept} represent {country}?</h3>
+    <div class="radio-group with-labels">
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_accuracy-1"
+                       name="rating-cultural_accuracy" 
+                       value="1"
+                       required>
+                <label for="rating-cultural_accuracy-1">1</label>
+            </div>
+            
+            <div class="button-label">Very inaccurate</div>
+            
+        </div>
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_accuracy-2"
+                       name="rating-cultural_accuracy" 
+                       value="2"
+                       required>
+                <label for="rating-cultural_accuracy-2">2</label>
+            </div>
+            
+            <div class="button-label">Somewhat inaccurate</div>
+            
+        </div>
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_accuracy-3"
+                       name="rating-cultural_accuracy" 
+                       value="3"
+                       required>
+                <label for="rating-cultural_accuracy-3">3</label>
+            </div>
+            
+            <div class="button-label">Neutral</div>
+            
+        </div>
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_accuracy-4"
+                       name="rating-cultural_accuracy" 
+                       value="4"
+                       required>
+                <label for="rating-cultural_accuracy-4">4</label>
+            </div>
+            
+            <div class="button-label">Somewhat accurate</div>
+            
+        </div>
+        
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-cultural_accuracy-5"
+                       name="rating-cultural_accuracy" 
+                       value="5"
+                       required>
+                <label for="rating-cultural_accuracy-5">5</label>
+            </div>
+            
+            <div class="button-label">Very accurate</div>
+            
+        </div>
+        
+    </div>
+</div>
+
+<style>
+    .radio-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;  /* Default gap for unlabeled buttons */
+        margin: 20px 0;
+    }
+
+    .radio-group.with-labels {
+        gap: 40px;  /* Increased gap when labels are present */
+    }
+
+    .radio-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .radio-option input[type="radio"] {
+        display: none;
+    }
+
+    .radio-option label {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 1.2em;
+        display: inline-block;
+        border: 2px solid #ddd;
+        border-radius: 50%;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+
+    .radio-option input[type="radio"]:checked + label {
+        background-color: #1295D8;
+        border-color: #1295D8;
+        color: white;
+    }
+
+    .radio-option label:hover {
+        background-color: #f0f0f0;
+    }
+
+    .button-label {
+        font-size: 0.9em;
+        color: #666;
+        text-align: center;
+        max-width: 80px;  /* Prevent super long labels from disrupting layout */
+        word-wrap: break-word;
+    }
+</style> 
+                        
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="navigation-container">
+                <button type="button" id="prev-button" class="nav-button" disabled>Previous</button>
+                <span id="progress-text">Loading...</span>
+                <button type="button" id="next-button" class="nav-button">Next</button>
+            </div>
+
+            <div class="submit-container">
+                <button type="submit" disabled>Submit All Ratings</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Iterator configuration
+const iteratorConfig = {
+    baseUrl: 'https://storage.googleapis.com/image-cultural-evaluation',
+    pattern: '{base_url}/{image_source}/{concept}/{country}/image_0.jpg',
+    iterators: {
+        
+        'concept': {
+            type: 'string_list',
+            values: ["breakfast", "clothing", "dance", "dessert", "dinner", "drinks", "eating habits", "farming", "festival", "funeral", "greetings", "head coverings", "instrument", "lunch", "marriage", "music", "religion", "sport", "transport"],
+            randomize: false
+        },
+        
+        'country': {
+            type: 'string_list',
+            values: ["China", "India", "United States", "Brazil", "Nigeria", "Russia", "Mexico", "Egypt", "Germany", "Indonesia"],
+            randomize: false
+        }
+        
+    },
+    randomize: false,
+    variables: {"image_source": "FLUX-country"}
+};
+
+// URL Generation function
+function generateUrl(variables) {
+    let pattern = iteratorConfig.pattern;
+    // Replace each variable in the pattern with its value
+    Object.entries(variables).forEach(([key, value]) => {
+        pattern = pattern.replace(`{${key}}`, value);
+    });
+    return pattern;
+}
+
+// Question templates with URL generation
+const questionTemplates = [
+    
+];
+
+// Display configuration
+const displayConfig = {
+    background_color: '#ffffff',
+    container_width: '800px',
+    image_position: 'left',
+    image_size: '400px',
+    question_spacing: '20px'
+}; 
+        // State management
+const state = {
+    currentIndex: 0,
+    answers: {},
+    sequence: generateSequence(),
+    currentValues: {}
+};
+
+// Navigation functions
+function generateSequence() {
+    let seq = Array.from({length: TOTAL_COMBINATIONS}, (_, i) => i);
+    if (iteratorConfig.randomize) {
+        seq.sort(() => Math.random() - 0.5);
+    }
+    return seq;
+}
+
+function getCurrentValues() {
+    const idx = state.currentIndex;
+    const values = {
+        ...iteratorConfig.variables  // Include static variables
+    };
+    
+    
+    const conceptLen = iteratorConfig.iterators.concept.values.length;
+    
+    const countryLen = iteratorConfig.iterators.country.values.length;
+    
+    
+    
+    const conceptIdx = Math.floor(idx / (1));
+    values.concept = iteratorConfig.iterators.concept.values[conceptIdx];
+    
+    const countryIdx = Math.floor(idx / (1));
+    values.country = iteratorConfig.iterators.country.values[countryIdx];
+    
+    
+    return values;
+}
+
+function getCurrentImageUrl() {
+    const values = getCurrentValues();
+    return generateUrl(values);
+}
+
+function updateQuestionText() {
+    const values = getCurrentValues();
+    document.querySelectorAll('.question-text').forEach((el, idx) => {
+        const question = questionTemplates[idx];
+        el.textContent = question.text(values);
+    });
+}
+
+// Calculate total combinations
+const TOTAL_COMBINATIONS = (function() {
+    let total = 1;
+    
+    total *= iteratorConfig.iterators.concept.values.length;
+    
+    total *= iteratorConfig.iterators.country.values.length;
+    
+    return total;
+})(); 
+        // UI update functions
+function updateImage() {
+    const imageContainer = document.querySelector('.image-container');
+    imageContainer.classList.add('loading');
+    
+    const values = getCurrentValues();
+    const imageUrl = generateUrl(values);
+    
+    const images = document.querySelectorAll('#current-image, #current-image-bottom');
+    images.forEach(img => {
+        img.src = imageUrl;
+        img.alt = `${values.concept} in ${values.country}`;
+        img.onload = () => imageContainer.classList.remove('loading');
+    });
+
+    updateQuestionText();
+    updateProgress();
+    updateNavigationButtons();
+    state.currentValues = values;
+}
+
+function updateProgress() {
+    const values = getCurrentValues();
+    const completed = questionTemplates.reduce((count, question) => {
+        const inputName = `${question.id}_${values.concept}_${values.country}`;
+        return count + (document.querySelector(`input[name="${inputName}"]:checked`) ? 1 : 0);
+    }, 0);
+    const totalExpectedAnswers = questionTemplates.length * TOTAL_COMBINATIONS;
+    
+    const percentage = (completed / totalExpectedAnswers) * 100;
+    document.querySelector('.progress-fill').style.width = `${percentage}%`;
+    document.querySelector('button[type="submit"]').textContent = 
+        `Submit All Ratings (${completed}/${totalExpectedAnswers} completed)`;
+    document.querySelector('#progress-text').textContent = 
+        `Image ${state.currentIndex + 1} of ${TOTAL_COMBINATIONS}`;
+    
+    document.querySelector('button[type="submit"]').disabled = 
+        completed < totalExpectedAnswers;
+}
+
+function updateNavigationButtons() {
+    document.getElementById('prev-button').disabled = state.currentIndex === 0;
+    document.getElementById('next-button').disabled = 
+        state.currentIndex === TOTAL_COMBINATIONS - 1;
+}
+
+// Event handlers
+document.getElementById('prev-button').addEventListener('click', () => {
+    if (state.currentIndex > 0) {
+        state.currentIndex--;
+        updateImage();
+    }
+});
+
+document.getElementById('next-button').addEventListener('click', () => {
+    if (state.currentIndex < TOTAL_COMBINATIONS - 1) {
+        state.currentIndex++;
+        updateImage();
+    }
+});
+
+document.querySelectorAll('input[type="radio"]').forEach(input => {
+    input.addEventListener('change', () => {
+        const values = getCurrentValues();
+        const questionId = input.name;
+        state.answers[`${questionId}_${values.concept}_${values.country}`] = {
+            value: input.value,
+            concept: values.concept,
+            country: values.country,
+            timestamp: new Date().toISOString()
+        };
+        updateProgress();
+    });
+});
+
+document.getElementById('annotation-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const totalExpectedAnswers = questionTemplates.length * TOTAL_COMBINATIONS;
+    const actualAnswers = Object.keys(state.answers).length;
+
+    if (actualAnswers < totalExpectedAnswers) {
+        alert(`Please answer all questions for all images. (${actualAnswers}/${totalExpectedAnswers} completed)`);
+        return;
+    }
+
+    try {
+        const response = await fetch('/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                answers: state.answers,
+                sequence: state.sequence,
+                config: {
+                    iterators: iteratorConfig.iterators,
+                    variables: iteratorConfig.variables
+                }
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Error submitting form: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the form.');
+    }
+}); 
+        
+        // Initialize
+        updateImage();
+    </script>
+</body>
+</html> 

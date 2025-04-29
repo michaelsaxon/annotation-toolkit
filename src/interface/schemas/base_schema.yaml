@@ -1,0 +1,41 @@
+version: "1.0"
+
+# Core configuration for the annotation interface
+config:
+  title: string  # Title of the annotation task
+  description: string  # Description shown to annotators
+  version: string  # Version of the interface
+
+# Input data specification
+input:
+  type: string  # Type of input (e.g., "single_image", "dual_image")
+  iterator:
+    type: string  # Type of iterator (e.g., "url_pattern", "csv")
+    config: object  # Configuration specific to the iterator type
+    arguments:  # HTML arguments that can be passed to customize the form
+      type: object
+      properties: {}  # To be extended by specific interface types
+
+# Questions/annotations to be collected
+questions:
+  type: array
+  items:
+    type: object
+    properties:
+      id: string  # Unique identifier for the question
+      type: string  # Type of question (e.g., "rating", "multiple_choice")
+      text: string  # Question text
+      required: boolean  # Whether the question is required
+      config: object  # Additional configuration specific to question type
+
+# Layout configuration
+layout:
+  type: string  # Layout type (e.g., "single_page", "multi_page")
+  config: object  # Layout-specific configuration
+
+# Output configuration
+output:
+  format: string  # Output format (e.g., "csv")
+  fields: array  # Fields to include in output
+    items:
+      type: string 

@@ -1,0 +1,12 @@
+[Unit]
+Description=Webform Flask Application
+After=network.target
+
+[Service]
+User=your_username
+WorkingDirectory=/path/to/Webform/backend
+Environment="PATH=/path/to/your/venv/bin"
+ExecStart=/path/to/your/venv/bin/gunicorn --bind 127.0.0.1:5000 app:app
+
+[Install]
+WantedBy=multi-user.target

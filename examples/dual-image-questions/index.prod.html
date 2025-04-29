@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cultural Image Evaluation Form</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background-color: #eee;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .image-pair {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+        }
+        .image-pair.active {
+            display: flex;
+            opacity: 1;
+        }
+        .image-box {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+        .image-container {
+            width: 100%;
+            max-height: 400px;
+            aspect-ratio: 1 / 1;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        .image-box img {
+            max-width: 100%;
+            max-height: 100%;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 5px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+        }
+        .rating-section {
+            text-align: left;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .rating-options {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .rating-options label {
+            display: block;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .rating-options label:hover {
+            background: #f0f0f0;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .completion-message {
+            display: none;
+            text-align: center;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .completion-code {
+            font-size: 2em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #fff;
+            border: 2px dashed #4CAF50;
+            border-radius: 5px;
+            display: inline-block;
+            font-family: monospace;
+        }
+        .completion-screen {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .completion-screen.visible {
+            opacity: 1;
+        }
+        .completion-screen h1 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        .completion-screen p {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .completion-code-box {
+            font-size: 2.5em;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 3px dashed #4CAF50;
+            border-radius: 8px;
+            display: inline-block;
+            color: #333;
+        }
+        .submit-container {
+            text-align: center;
+            margin: 10px 0 15px 0;
+            display: none;
+        }
+        .submit-button {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .rating-desc {
+            color: #666;
+            font-style: italic;
+        }
+        .text-display {
+            font-size: 1.1em;
+            margin: 10px 0;
+            padding-left: 10px;
+            border-left: 4px solid #4CAF50;
+            line-height: 1.4;
+        }
+        .text-label {
+            color: #8B0000; /* Dark red */
+            font-weight: bold;
+        }
+        .text-content {
+            font-style: italic;
+        }
+        h1 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+        h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        p {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Cultural Image Evaluation Form</h1>
+            <p>Country: <span id="country-display">Loading...</span></p>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <p>Progress: <span id="completed">0</span>/<span id="total">110</span> pairs</p>
+        </div>
+
+        <div class="submit-container" id="submitContainer">
+            <button class="submit-button" id="submitButton" onclick="submitRatings()">Submit All Ratings</button>
+        </div>
+
+        <div id="image-pairs">
+            <!-- Image pairs will be dynamically inserted here -->
+        </div>
+
+        <div class="navigation">
+            <button id="prevBtn" onclick="showPreviousPair()" disabled>Previous</button>
+            <button id="nextBtn" onclick="showNextPair()" disabled>Next</button>
+        </div>
+
+        <div id="completionMessage" class="completion-message">
+            <h2>Thank you for completing the evaluation!</h2>
+            <p>Your responses have been recorded.</p>
+            <p>Please copy the following code to redeem your payment:</p>
+            <div class="completion-code" id="completionCode"></div>
+            <p>You can now close this window and return to Prolific.</p>
+        </div>
+        
+        <div id="completionScreen" class="completion-screen">
+            <h1>Thank You!</h1>
+            <p>You have successfully completed the cultural image evaluation.</p>
+            <p>Your responses have been recorded and will be used for research purposes.</p>
+            <p>Please copy the following code to redeem your payment on Prolific:</p>
+            <div class="completion-code-box" id="completionCodeBox"></div>
+            <p>You can now close this window and return to Prolific.</p>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Country mapping from ID to display name
+        const countryMap = {
+            'brazil': 'Brazil',
+            'india': 'India',
+            'japan': 'Japan',
+            'nigeria': 'Nigeria',
+            'portugal': 'Portugal',
+            'turkey': 'Turkey',
+            'us': 'the USA'
+        };
+        
+        // Get country ID from URL or default to 'india'
+        const countryId = urlParams.get('country') || 'india';
+        
+        // Get display name from mapping
+        const country = countryMap[countryId.toLowerCase()] || 'India';
+        
+        // Check for debug modes
+        const isDebugMode = urlParams.get('debug') === 'true';
+        const isGhostMode = urlParams.get('debug') === 'ghost';
+        
+        // If in ghost mode, show a banner
+        if (isGhostMode) {
+            const ghostBanner = document.createElement('div');
+            ghostBanner.style.backgroundColor = '#ff9800';
+            ghostBanner.style.color = 'white';
+            ghostBanner.style.padding = '5px';
+            ghostBanner.style.textAlign = 'center';
+            ghostBanner.style.fontWeight = 'bold';
+            ghostBanner.style.marginBottom = '10px';
+            ghostBanner.textContent = 'GHOST MODE: No ratings required. Use for image verification only.';
+            document.querySelector('.container').insertBefore(ghostBanner, document.querySelector('.header'));
+            
+            // Add a div to display current image paths
+            const pathDisplay = document.createElement('div');
+            pathDisplay.id = 'ghost-path-display';
+            pathDisplay.style.backgroundColor = '#f0f0f0';
+            pathDisplay.style.padding = '10px';
+            pathDisplay.style.marginBottom = '10px';
+            pathDisplay.style.fontFamily = 'monospace';
+            pathDisplay.style.fontSize = '12px';
+            pathDisplay.style.whiteSpace = 'pre-wrap';
+            pathDisplay.style.wordBreak = 'break-all';
+            pathDisplay.style.border = '1px solid #ddd';
+            pathDisplay.style.borderRadius = '4px';
+            document.querySelector('.container').insertBefore(pathDisplay, document.querySelector('.header'));
+        }
+        
+        // Hard-coded text for each image
+        const imageTexts = `temple
+houses
+beverages
+fruit
+bird
+fruit
+bird
+food
+utensil
+mammal
+agriculture
+fruit
+sport
+clothing
+sport
+music
+clothing
+flower
+visual-arts
+utensil
+vegetable
+beverages
+food
+houses
+agriculture
+visual-arts
+music
+utensil
+sport
+beverages
+vegetable
+music
+flower
+beverages
+mammal
+food
+agriculture
+sport
+flower
+clothing
+houses
+fruit
+beverages
+clothing
+beverages
+agriculture
+mammal
+music
+vegetable
+food
+mammal
+music
+clothing
+agriculture
+music
+visual-arts
+beverages
+agriculture
+clothing
+vegetable
+visual-arts
+bird
+mammal
+beverages
+agriculture
+sport
+utensil
+visual-arts
+food
+agriculture
+beverages
+beverages
+vegetable
+clothing
+agriculture
+fruit
+flower
+visual-arts
+visual-arts
+sport
+vegetable
+clothing
+agriculture
+food
+mammal
+fruit
+visual-arts
+utensil
+houses
+visual-arts
+flower
+food
+music
+clothing
+clothing
+beverages
+flower
+vegetable
+clothing
+sport
+Circle the picture that doesn't belong
+Count the number of muffins each kid gets
+Find the number of cherries
+Count and write the number
+Circle the picture that doesn't belong
+Count each scary thing and write
+Yes you are a good boy.
+On Tuesday Daddy rode a bicycle to work.
+My mother is reading a Bible.
+Nandi has plated hair. She looks smart too.`;
+
+        // Function to get text for a specific image index
+        function getTextForImage(index) {
+            const lines = imageTexts.split('\n');
+            return index < lines.length ? lines[index] : "text not found";
+        }
+        
+        // Display country
+        document.getElementById('country-display').textContent = country;
+        
+        // Generate indices (0-10) and shuffle them
+        const totalIndices = isDebugMode ? 5 : 110; // Use 5 samples in debug mode, 11 otherwise
+        const indices = Array.from({length: totalIndices}, (_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        
+        // Update total count display
+        document.getElementById('total').textContent = totalIndices;
+        
+        // Create image pairs
+        const imagePairsContainer = document.getElementById('image-pairs');
+        
+        indices.forEach((index, pairIndex) => {
+            const inputPath = `https://storage.googleapis.com/image-cultural-evaluation/hilite-data-corrected/${countryId}/${index}/input_image.jpg`;
+            const outputPath = `https://storage.googleapis.com/image-cultural-evaluation/hilite-data-corrected/${countryId}/${index}/output_image.jpg`;
+            
+            const pairDiv = document.createElement('div');
+            pairDiv.className = 'image-pair';
+            pairDiv.dataset.index = index;
+            pairDiv.dataset.pairIndex = pairIndex;
+            
+            // Randomly decide which image goes on which side
+            const isInputLeft = Math.random() < 0.5;
+            
+            // Create both image boxes
+            const leftBox = document.createElement('div');
+            leftBox.className = 'image-box';
+            
+            const rightBox = document.createElement('div');
+            rightBox.className = 'image-box';
+            
+            // Set up the left image
+            const leftImg = document.createElement('img');
+            leftImg.src = isInputLeft ? inputPath : outputPath;
+            leftImg.alt = isInputLeft ? `Input Image ${index}` : `Output Image ${index}`;
+            
+            // Create image container for left image
+            const leftImgContainer = document.createElement('div');
+            leftImgContainer.className = 'image-container';
+            leftImgContainer.appendChild(leftImg);
+            
+            // Set up the right image
+            const rightImg = document.createElement('img');
+            rightImg.src = isInputLeft ? outputPath : inputPath;
+            rightImg.alt = isInputLeft ? `Output Image ${index}` : `Input Image ${index}`;
+            
+            // Create image container for right image
+            const rightImgContainer = document.createElement('div');
+            rightImgContainer.className = 'image-container';
+            rightImgContainer.appendChild(rightImg);
+            
+            // First rating section for left image - Cultural relevance
+            const leftCulturalSection = document.createElement('div');
+            leftCulturalSection.className = 'rating-section';
+            
+            const leftCulturalTitle = document.createElement('h3');
+            leftCulturalTitle.textContent = `How culturally relevant is this image to ${country}?`;
+            
+            const leftCulturalOptions = document.createElement('div');
+            leftCulturalOptions.className = 'rating-options';
+            
+            // Create radio buttons for cultural relevance for left image
+            for (let i = 1; i <= 5; i++) {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = isInputLeft ? `input-cultural-${index}` : `output-cultural-${index}`;
+                radio.value = i;
+                
+                let ratingText = '';
+                let ratingDesc = '';
+                if (i === 1) {
+                    ratingText = 'Not Relevant';
+                    ratingDesc = `Image has no cultural connection to ${country}`;
+                } else if (i === 2) {
+                    ratingText = 'Slightly Relevant';
+                    ratingDesc = `Image has minimal cultural connection to ${country}`;
+                } else if (i === 3) {
+                    ratingText = 'Moderately Relevant';
+                    ratingDesc = `Image has some cultural connection to ${country}`;
+                } else if (i === 4) {
+                    ratingText = 'Very Relevant';
+                    ratingDesc = `Image has strong cultural connection to ${country}`;
+                } else {
+                    ratingText = 'Extremely Relevant';
+                    ratingDesc = `Image perfectly represents ${country}'s culture`;
+                }
+                
+                label.innerHTML = `<strong>${i} - ${ratingText}:</strong> <span class="rating-desc">${ratingDesc}</span>`;
+                label.prepend(radio);
+                leftCulturalOptions.appendChild(label);
+            }
+            
+            leftCulturalSection.appendChild(leftCulturalTitle);
+            leftCulturalSection.appendChild(leftCulturalOptions);
+            
+            // Second rating section for left image - Text match
+            const leftTextSection = document.createElement('div');
+            leftTextSection.className = 'rating-section';
+            
+            const leftTextTitle = document.createElement('h3');
+            leftTextTitle.textContent = `Does this image match the text?`;
+            
+            // Add the text display
+            const leftTextDisplay = document.createElement('p');
+            leftTextDisplay.className = 'text-display';
+            leftTextDisplay.textContent = `Text: "${getTextForImage(index)}"`;
+            leftTextDisplay.style.fontWeight = 'bold';
+            leftTextDisplay.style.marginBottom = '15px';
+            
+            const leftTextOptions = document.createElement('div');
+            leftTextOptions.className = 'rating-options';
+            
+            // Create radio buttons for text match for left image
+            for (let i = 1; i <= 5; i++) {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = isInputLeft ? `input-text-${index}` : `output-text-${index}`;
+                radio.value = i;
+                
+                let ratingText = '';
+                let ratingDesc = '';
+                if (i === 1) {
+                    ratingText = 'Completely Disagree';
+                    ratingDesc = 'Image does not match text at all';
+                } else if (i === 2) {
+                    ratingText = 'Disagree';
+                    ratingDesc = 'Image has minimal match with the text';
+                } else if (i === 3) {
+                    ratingText = 'Neutral';
+                    ratingDesc = 'Image somewhat matches the text';
+                } else if (i === 4) {
+                    ratingText = 'Agree';
+                    ratingDesc = 'Image matches the text well';
+                } else {
+                    ratingText = 'Completely Agree';
+                    ratingDesc = 'Image perfectly matches the text';
+                }
+                
+                label.innerHTML = `<strong>${i} - ${ratingText}:</strong> <span class="rating-desc">${ratingDesc}</span>`;
+                label.prepend(radio);
+                leftTextOptions.appendChild(label);
+            }
+            
+            leftTextSection.appendChild(leftTextTitle);
+            leftTextSection.appendChild(leftTextDisplay);
+            leftTextSection.appendChild(leftTextOptions);
+            
+            // First rating section for right image - Cultural relevance
+            const rightCulturalSection = document.createElement('div');
+            rightCulturalSection.className = 'rating-section';
+            
+            const rightCulturalTitle = document.createElement('h3');
+            rightCulturalTitle.textContent = `How culturally relevant is this image to ${country}?`;
+            
+            const rightCulturalOptions = document.createElement('div');
+            rightCulturalOptions.className = 'rating-options';
+            
+            // Create radio buttons for cultural relevance for right image
+            for (let i = 1; i <= 5; i++) {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = isInputLeft ? `output-cultural-${index}` : `input-cultural-${index}`;
+                radio.value = i;
+                
+                let ratingText = '';
+                let ratingDesc = '';
+                if (i === 1) {
+                    ratingText = 'Not Relevant';
+                    ratingDesc = `Image has no cultural connection to ${country}`;
+                } else if (i === 2) {
+                    ratingText = 'Slightly Relevant';
+                    ratingDesc = `Image has minimal cultural connection to ${country}`;
+                } else if (i === 3) {
+                    ratingText = 'Moderately Relevant';
+                    ratingDesc = `Image has some cultural connection to ${country}`;
+                } else if (i === 4) {
+                    ratingText = 'Very Relevant';
+                    ratingDesc = `Image has strong cultural connection to ${country}`;
+                } else {
+                    ratingText = 'Extremely Relevant';
+                    ratingDesc = `Image perfectly represents ${country}'s culture`;
+                }
+                
+                label.innerHTML = `<strong>${i} - ${ratingText}:</strong> <span class="rating-desc">${ratingDesc}</span>`;
+                label.prepend(radio);
+                rightCulturalOptions.appendChild(label);
+            }
+            
+            rightCulturalSection.appendChild(rightCulturalTitle);
+            rightCulturalSection.appendChild(rightCulturalOptions);
+            
+            // Second rating section for right image - Text match
+            const rightTextSection = document.createElement('div');
+            rightTextSection.className = 'rating-section';
+            
+            const rightTextTitle = document.createElement('h3');
+            rightTextTitle.textContent = `Does this image match the text?`;
+            
+            // Add the text display
+            const rightTextDisplay = document.createElement('p');
+            rightTextDisplay.className = 'text-display';
+            rightTextDisplay.textContent = `Text: "${getTextForImage(index)}"`;
+            rightTextDisplay.style.fontWeight = 'bold';
+            rightTextDisplay.style.marginBottom = '15px';
+            
+            const rightTextOptions = document.createElement('div');
+            rightTextOptions.className = 'rating-options';
+            
+            // Create radio buttons for text match for right image
+            for (let i = 1; i <= 5; i++) {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = isInputLeft ? `output-text-${index}` : `input-text-${index}`;
+                radio.value = i;
+                
+                let ratingText = '';
+                let ratingDesc = '';
+                if (i === 1) {
+                    ratingText = 'Completely Disagree';
+                    ratingDesc = 'Image does not match text at all';
+                } else if (i === 2) {
+                    ratingText = 'Disagree';
+                    ratingDesc = 'Image has minimal match with the text';
+                } else if (i === 3) {
+                    ratingText = 'Neutral';
+                    ratingDesc = 'Image somewhat matches the text';
+                } else if (i === 4) {
+                    ratingText = 'Agree';
+                    ratingDesc = 'Image matches the text well';
+                } else {
+                    ratingText = 'Completely Agree';
+                    ratingDesc = 'Image perfectly matches the text';
+                }
+                
+                label.innerHTML = `<strong>${i} - ${ratingText}:</strong> <span class="rating-desc">${ratingDesc}</span>`;
+                label.prepend(radio);
+                rightTextOptions.appendChild(label);
+            }
+            
+            rightTextSection.appendChild(rightTextTitle);
+            rightTextSection.appendChild(rightTextDisplay);
+            rightTextSection.appendChild(rightTextOptions);
+            
+            // Assemble the left box
+            leftBox.appendChild(leftImgContainer);
+            leftBox.appendChild(leftCulturalSection);
+            leftBox.appendChild(leftTextSection);
+            
+            // Assemble the right box
+            rightBox.appendChild(rightImgContainer);
+            rightBox.appendChild(rightCulturalSection);
+            rightBox.appendChild(rightTextSection);
+            
+            // Add both boxes to the pair
+            pairDiv.appendChild(leftBox);
+            pairDiv.appendChild(rightBox);
+            
+            // Add the pair to the container
+            imagePairsContainer.appendChild(pairDiv);
+        });
+        
+        // Navigation variables
+        let currentPairIndex = 0;
+        const pairs = document.querySelectorAll('.image-pair');
+        const totalPairs = pairs.length;
+        const progressBar = document.getElementById('progress');
+        const completedSpan = document.getElementById('completed');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const completionMessage = document.getElementById('completionMessage');
+        const submitContainer = document.getElementById('submitContainer');
+        const submitButton = document.getElementById('submitButton');
+        
+        // Track completed pairs
+        const completedPairs = new Set();
+        
+        function updateProgress() {
+            const completed = completedPairs.size;
+            const percentage = (completed / totalPairs) * 100;
+            progressBar.style.width = percentage + '%';
+            completedSpan.textContent = completed;
+            
+            // Show submit button if all pairs are completed
+            if (completed === totalPairs) {
+                submitContainer.style.display = 'block';
+            } else {
+                submitContainer.style.display = 'none';
+            }
+        }
+        
+        function isPairCompleted(pairIndex) {
+            // In ghost mode, always return true to allow navigation without ratings
+            if (isGhostMode) {
+                return true;
+            }
+            
+            const pair = pairs[pairIndex];
+            const index = pair.dataset.index;
+            const inputCulturalChecked = document.querySelector(`input[name='input-cultural-${index}']:checked`);
+            const outputCulturalChecked = document.querySelector(`input[name='output-cultural-${index}']:checked`);
+            const inputTextChecked = document.querySelector(`input[name='input-text-${index}']:checked`);
+            const outputTextChecked = document.querySelector(`input[name='output-text-${index}']:checked`);
+            
+            return inputCulturalChecked && outputCulturalChecked && 
+                   inputTextChecked && outputTextChecked;
+        }
+        
+        function showPair(index) {
+            // Fade out current pair
+            const currentPair = document.querySelector('.image-pair.active');
+            if (currentPair) {
+                currentPair.style.opacity = '0';
+                
+                // Wait for fade out to complete before changing display
+                setTimeout(() => {
+                    pairs.forEach(pair => {
+                        pair.classList.remove('active');
+                    });
+                    pairs[index].classList.add('active');
+                    
+                    // Trigger reflow to ensure the transition works
+                    void pairs[index].offsetWidth;
+                    
+                    // Fade in the new pair
+                    pairs[index].style.opacity = '1';
+                    
+                    // Update path display in ghost mode
+                    if (isGhostMode) {
+                        updateGhostPathDisplay(index);
+                    }
+                }, 100); // Match the transition duration
+            } else {
+                // If no active pair (first load), just show the pair
+                pairs.forEach(pair => {
+                    pair.classList.remove('active');
+                });
+                pairs[index].classList.add('active');
+                pairs[index].style.opacity = '1';
+                
+                // Update path display in ghost mode
+                if (isGhostMode) {
+                    updateGhostPathDisplay(index);
+                }
+            }
+            
+            // Update navigation buttons
+            prevBtn.disabled = index === 0;
+            
+            // Check if we're on the last pair
+            if (index === totalPairs - 1) {
+                // Replace Next button with Submit button
+                nextBtn.textContent = 'Submit';
+                nextBtn.onclick = submitRatings;
+                
+                // Only enable the Submit button if the current pair is completed
+                nextBtn.disabled = !isPairCompleted(index);
+                
+            } else {
+                // Reset to Next button for non-final pairs
+                nextBtn.textContent = 'Next';
+                nextBtn.onclick = showNextPair;
+                
+                // Reset button styling
+                nextBtn.style.fontWeight = 'normal';
+                
+                // Next button is only enabled if the current pair is completed
+                // or if we're going back to fix something
+                nextBtn.disabled = !isPairCompleted(index) && !completedPairs.has(index);
+            }
+            
+            updateProgress();
+        }
+        
+        function showNextPair() {
+            if (currentPairIndex < totalPairs - 1) {
+                currentPairIndex++;
+                showPair(currentPairIndex);
+            }
+        }
+        
+        function showPreviousPair() {
+            if (currentPairIndex > 0) {
+                currentPairIndex--;
+                showPair(currentPairIndex);
+            }
+        }
+        
+        function checkAndAdvance() {
+            if (isPairCompleted(currentPairIndex)) {
+                completedPairs.add(currentPairIndex);
+                updateProgress();
+                
+                // Update the Submit button in navigation if we're on the last pair
+                if (currentPairIndex === totalPairs - 1) {
+                    // Add a visual indicator that this is a submit button
+                    nextBtn.style.backgroundColor = '#2196F3'; // Blue color to distinguish from Next
+                    nextBtn.style.fontWeight = 'bold';
+                    nextBtn.disabled = false; // Enable the Submit button
+                }
+                
+                // Auto-advance to next pair if not the last one
+                if (currentPairIndex < totalPairs - 1) {
+                    setTimeout(() => {
+                        showNextPair();
+                    }, 500); // Small delay for better UX
+                }
+            }
+        }
+        
+        // Add event listeners to all radio buttons
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                checkAndAdvance();
+            });
+        });
+        
+        function collectRatings() {
+            const ratings = [];
+            pairs.forEach(pair => {
+                const index = pair.dataset.index;
+                const inputCultural = document.querySelector(`input[name='input-cultural-${index}']:checked`)?.value;
+                const outputCultural = document.querySelector(`input[name='output-cultural-${index}']:checked`)?.value;
+                const inputText = document.querySelector(`input[name='input-text-${index}']:checked`)?.value;
+                const outputText = document.querySelector(`input[name='output-text-${index}']:checked`)?.value;
+                
+                if (inputCultural && outputCultural && inputText && outputText) {
+                    ratings.push({
+                        index: index,
+                        input_cultural: inputCultural,
+                        output_cultural: outputCultural,
+                        input_text: inputText,
+                        output_text: outputText
+                    });
+                }
+            });
+            return ratings;
+        }
+        
+        // Generate a random 4-character code
+        function generateCompletionCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                code += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return code;
+        }
+        
+        async function submitRatings() {
+            const ratings = collectRatings();
+            
+            // In ghost mode, create dummy ratings for all pairs
+            if (isGhostMode) {
+                ratings.length = 0; // Clear any collected ratings
+                pairs.forEach(pair => {
+                    const index = pair.dataset.index;
+                    ratings.push({
+                        index: index,
+                        input_cultural: "1",
+                        output_cultural: "1",
+                        input_text: "1",
+                        output_text: "1"
+                    });
+                });
+            } else if (ratings.length !== totalPairs) {
+                alert('Please complete all ratings before submitting.');
+                return;
+            }
+            
+            // Generate completion code
+            const completionCode = generateCompletionCode();
+            
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ratings: ratings,
+                        country: country,
+                        completion_code: completionCode,
+                        debug: isDebugMode || isGhostMode,
+                        country_id: countryId
+                    })
+                });
+                
+                if (response.ok) {
+                    // Hide the form and show completion screen
+                    document.getElementById('image-pairs').style.display = 'none';
+                    document.querySelector('.navigation').style.display = 'none';
+                    submitContainer.style.display = 'none';
+                    
+                    // Set the completion code
+                    document.getElementById('completionCodeBox').textContent = completionCode;
+                    
+                    // Show and fade in the completion screen
+                    const completionScreen = document.getElementById('completionScreen');
+                    completionScreen.style.display = 'block';
+                    
+                    // Trigger reflow to ensure the transition works
+                    void completionScreen.offsetWidth;
+                    
+                    // Add the visible class to trigger the fade-in
+                    completionScreen.classList.add('visible');
+                } else {
+                    alert('Error submitting ratings. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error submitting ratings. Please try again.');
+            }
+        }
+        
+        // Function to update the ghost path display
+        function updateGhostPathDisplay(index) {
+            if (!isGhostMode) return;
+            
+            const pair = pairs[index];
+            const imageIndex = pair.dataset.index;
+            const inputPath = `https://storage.googleapis.com/image-cultural-evaluation/hilite-data-corrected/${countryId}/${imageIndex}/input_image.jpg`;
+            const outputPath = `https://storage.googleapis.com/image-cultural-evaluation/hilite-data-corrected/${countryId}/${imageIndex}/output_image.jpg`;
+            
+            const pathDisplay = document.getElementById('ghost-path-display');
+            pathDisplay.innerHTML = `Current Image Index: ${imageIndex}<br>Input: ${inputPath}<br>Output: ${outputPath}`;
+        }
+        
+        // Show first pair on load
+        showPair(0);
+    </script>
+</body>
+</html> 

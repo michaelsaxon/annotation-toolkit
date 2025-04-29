@@ -1,0 +1,12 @@
+[Unit]
+Description=Hilite Webform Flask Application
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/var/www/html/hilite-webform/backend
+Environment="PATH=/var/www/html/hilite-webform/backend/venv/bin"
+ExecStart=/var/www/html/hilite-webform/backend/venv/bin/gunicorn --bind 127.0.0.1:5050 app:app
+
+[Install]
+WantedBy=multi-user.target 

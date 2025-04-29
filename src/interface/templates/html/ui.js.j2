@@ -1,0 +1,118 @@
+// UI update functions
+function updateImage() {
+    const imageContainer = document.querySelector('.image-container');
+    imageContainer.classList.add('loading');
+    
+    const currentItem = document.querySelector(`.image-item[data-index="${state.currentIndex}"]`);
+    const img = currentItem.querySelector('img');
+    
+    img.onload = () => imageContainer.classList.remove('loading');
+    updateProgress();
+    updateNavigationButtons();
+}
+
+function updateProgress() {
+    const values = getCurrentValues();
+    const completed = questionTemplates.reduce((count, question) => {
+        const inputName = `${question.id}_${values.concept}_${values.country}`;
+        return count + (document.querySelector(`input[name="${inputName}"]:checked`) ? 1 : 0);
+    }, 0);
+    const totalExpectedAnswers = questionTemplates.length * TOTAL_COMBINATIONS;
+    
+    const percentage = (completed / totalExpectedAnswers) * 100;
+    document.querySelector('.progress-fill').style.width = `${percentage}%`;
+    document.querySelector('button[type="submit"]').textContent = 
+        `Submit All Ratings (${completed}/${totalExpectedAnswers} completed)`;
+    document.querySelector('#progress-text').textContent = 
+        `Image ${state.currentIndex + 1} of ${TOTAL_COMBINATIONS}`;
+    
+    document.querySelector('button[type="submit"]').disabled = 
+        completed < totalExpectedAnswers;
+}
+
+function updateNavigationButtons() {
+    document.getElementById('prev-button').disabled = state.currentIndex === 0;
+    document.getElementById('next-button').disabled = 
+        state.currentIndex === TOTAL_COMBINATIONS - 1;
+}
+
+// Event handlers
+document.getElementById('prev-button').addEventListener('click', () => {
+    if (state.currentIndex > 0) {
+        showImage(state.currentIndex - 1);
+    }
+});
+
+document.getElementById('next-button').addEventListener('click', () => {
+    if (state.currentIndex < state.totalItems - 1) {
+        showImage(state.currentIndex + 1);
+    }
+});
+
+document.querySelectorAll('input[type="radio"]').forEach(input => {
+    input.addEventListener('change', () => {
+        const values = getCurrentValues();
+        const questionId = input.name;
+        state.answers[`${questionId}_${values.concept}_${values.country}`] = {
+            value: input.value,
+            concept: values.concept,
+            country: values.country,
+            timestamp: new Date().toISOString()
+        };
+        updateProgress();
+    });
+});
+
+document.getElementById('annotation-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const totalExpectedAnswers = QUESTIONS.length * state.totalItems;
+    const actualAnswers = Object.keys(state.answers).length;
+
+    if (actualAnswers < totalExpectedAnswers) {
+        alert(`Please answer all questions for all images. (${actualAnswers}/${totalExpectedAnswers} completed)`);
+        return;
+    }
+
+    try {
+        // Create a clean copy of the answers without any functions
+        const cleanAnswers = {};
+        for (const key in state.answers) {
+            cleanAnswers[key] = {
+                value: state.answers[key].value,
+                timestamp: state.answers[key].timestamp
+            };
+            
+            // Add iterator values as separate properties
+            for (const iteratorName in ITERATORS) {
+                if (state.answers[key][iteratorName]) {
+                    cleanAnswers[key][iteratorName] = state.answers[key][iteratorName];
+                }
+            }
+        }
+        
+        const response = await fetch('/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                answers: cleanAnswers,
+                config: {
+                    iterators: ITERATORS,
+                    imageSource: CONFIG.imageSource
+                }
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Error submitting form: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the form.');
+    }
+}); 

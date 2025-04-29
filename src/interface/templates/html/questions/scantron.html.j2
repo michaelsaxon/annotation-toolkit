@@ -1,0 +1,81 @@
+<div class="question-container" data-question-id="{{ question.id }}">
+    <h3>{{ question.text }}</h3>
+    <div class="radio-group {% if question.config.show_labels %}with-labels{% endif %}">
+        {% for i in range(question.config.min, question.config.max + 1, question.config.step) %}
+        <div class="radio-option">
+            <div class="button-container">
+                <input type="radio" 
+                       id="rating-{{ question.id }}-{{ i }}"
+                       name="rating-{{ question.id }}" 
+                       value="{{ i }}"
+                       {% if question.required %}required{% endif %}>
+                <label for="rating-{{ question.id }}-{{ i }}">{{ i }}</label>
+            </div>
+            {% if question.config.show_labels and question.config.labels %}
+            <div class="button-label">{{ question.config.labels[i - question.config.min] }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .radio-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;  /* Default gap for unlabeled buttons */
+        margin: 20px 0;
+    }
+
+    .radio-group.with-labels {
+        gap: 40px;  /* Increased gap when labels are present */
+    }
+
+    .radio-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .radio-option input[type="radio"] {
+        display: none;
+    }
+
+    .radio-option label {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 1.2em;
+        display: inline-block;
+        border: 2px solid #ddd;
+        border-radius: 50%;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+
+    .radio-option input[type="radio"]:checked + label {
+        background-color: #1295D8;
+        border-color: #1295D8;
+        color: white;
+    }
+
+    .radio-option label:hover {
+        background-color: #f0f0f0;
+    }
+
+    .button-label {
+        font-size: 0.9em;
+        color: #666;
+        text-align: center;
+        max-width: 80px;  /* Prevent super long labels from disrupting layout */
+        word-wrap: break-word;
+    }
+</style> 

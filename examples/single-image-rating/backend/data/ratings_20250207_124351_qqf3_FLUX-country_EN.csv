@@ -1,0 +1,22 @@
+concept,country,score
+breakfast,Japan,4
+breakfast,United States,5
+breakfast,Brazil,5
+breakfast,China,2
+breakfast,Vietnam,5
+breakfast,Egypt,5
+breakfast,Mexico,5
+dance,Egypt,5
+dance,Mexico,5
+dance,Japan,3
+dance,China,5
+dance,United States,1
+dance,Vietnam,4
+dance,Brazil,3
+clothing,Japan,2
+clothing,China,4
+clothing,Brazil,3
+clothing,Mexico,5
+clothing,United States,4
+clothing,Egypt,5
+clothing,Vietnam,4

@@ -1,0 +1,191 @@
+concept,country,score
+head coverings,Nigeria,3
+head coverings,Germany,2
+head coverings,China,4
+head coverings,Mexico,5
+head coverings,Brazil,3
+head coverings,Indonesia,4
+head coverings,United States,2
+head coverings,Egypt,2
+head coverings,Russia,2
+head coverings,India,4
+clothing,Brazil,5
+clothing,Indonesia,4
+clothing,Mexico,4
+clothing,India,3
+clothing,Russia,3
+clothing,Germany,3
+clothing,Nigeria,3
+clothing,Egypt,4
+clothing,China,4
+clothing,United States,4
+funeral,Russia,4
+funeral,Egypt,5
+funeral,Germany,5
+funeral,Nigeria,5
+funeral,China,5
+funeral,Indonesia,5
+funeral,Mexico,5
+funeral,United States,5
+funeral,Brazil,5
+funeral,India,5
+dessert,Germany,5
+dessert,Egypt,5
+dessert,China,5
+dessert,India,5
+dessert,Nigeria,5
+dessert,Mexico,4
+dessert,Indonesia,4
+dessert,Russia,4
+dessert,Brazil,4
+dessert,United States,4
+marriage,Indonesia,4
+marriage,United States,5
+marriage,Germany,5
+marriage,India,5
+marriage,Brazil,5
+marriage,Mexico,5
+marriage,Russia,5
+marriage,China,5
+marriage,Nigeria,5
+marriage,Egypt,5
+farming,United States,5
+farming,Germany,5
+farming,Nigeria,5
+farming,Russia,5
+farming,Mexico,5
+farming,Brazil,5
+farming,Indonesia,5
+farming,Egypt,5
+farming,China,5
+farming,India,5
+breakfast,Indonesia,5
+breakfast,Germany,5
+breakfast,Nigeria,5
+breakfast,Russia,5
+breakfast,Egypt,5
+breakfast,China,5
+breakfast,United States,5
+breakfast,Brazil,5
+breakfast,Mexico,5
+breakfast,India,5
+dinner,United States,5
+dinner,Brazil,5
+dinner,India,5
+dinner,Nigeria,5
+dinner,Mexico,5
+dinner,China,5
+dinner,Russia,5
+dinner,Egypt,5
+dinner,Indonesia,5
+dinner,Germany,5
+eating habits,Nigeria,5
+eating habits,Russia,5
+eating habits,China,5
+eating habits,Brazil,5
+eating habits,Indonesia,5
+eating habits,United States,5
+eating habits,Germany,5
+eating habits,Mexico,5
+eating habits,India,5
+eating habits,Egypt,5
+greetings,Nigeria,5
+greetings,Russia,5
+greetings,Egypt,5
+greetings,Germany,5
+greetings,Indonesia,5
+greetings,United States,5
+greetings,China,5
+greetings,Mexico,5
+greetings,India,5
+greetings,Brazil,5
+music,China,5
+music,Egypt,5
+music,Indonesia,5
+music,Russia,5
+music,Brazil,5
+music,Nigeria,5
+music,United States,5
+music,Mexico,5
+music,India,5
+music,Germany,5
+lunch,Brazil,5
+lunch,Germany,5
+lunch,Egypt,5
+lunch,China,5
+lunch,United States,5
+lunch,Russia,5
+lunch,India,5
+lunch,Mexico,5
+lunch,Indonesia,5
+lunch,Nigeria,5
+dance,Indonesia,5
+dance,United States,5
+dance,India,5
+dance,Brazil,5
+dance,Germany,5
+dance,Nigeria,5
+dance,Russia,5
+dance,China,5
+dance,Egypt,5
+dance,Mexico,5
+religion,Indonesia,5
+religion,Nigeria,5
+religion,Egypt,5
+religion,United States,5
+religion,China,5
+religion,Germany,5
+religion,India,5
+religion,Brazil,5
+religion,Mexico,5
+religion,Russia,5
+sport,China,5
+sport,Nigeria,5
+sport,Indonesia,5
+sport,Egypt,5
+sport,United States,5
+sport,Russia,5
+sport,India,5
+sport,Brazil,5
+sport,Germany,5
+sport,Mexico,5
+transport,India,5
+transport,Nigeria,5
+transport,Germany,5
+transport,Mexico,5
+transport,United States,5
+transport,Russia,5
+transport,Brazil,5
+transport,Egypt,5
+transport,China,5
+transport,Indonesia,5
+instrument,United States,5
+instrument,Brazil,5
+instrument,Mexico,5
+instrument,China,5
+instrument,Germany,5
+instrument,India,5
+instrument,Nigeria,5
+instrument,Egypt,4
+instrument,Indonesia,4
+instrument,Russia,4
+festival,China,4
+festival,Egypt,4
+festival,India,4
+festival,Nigeria,4
+festival,Germany,4
+festival,Brazil,4
+festival,Mexico,4
+festival,Russia,4
+festival,Indonesia,4
+festival,United States,4
+drinks,Indonesia,4
+drinks,Russia,4
+drinks,Brazil,4
+drinks,Germany,4
+drinks,United States,4
+drinks,Nigeria,4
+drinks,China,4
+drinks,India,4
+drinks,Mexico,4
+drinks,Egypt,4

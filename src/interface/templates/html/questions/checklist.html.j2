@@ -1,0 +1,46 @@
+<div class="question-container" data-question-id="{{ question.id }}">
+    <h3>{{ question.text }}</h3>
+    <div class="rating-options">
+        {% for i in range(question.config.min, question.config.max + 1, question.config.step) %}
+        <label class="rating-option">
+            <input type="radio" 
+                   name="rating-{{ question.id }}" 
+                   value="{{ i }}"
+                   {% if question.required %}required{% endif %}>
+            <span class="rating-label">{{ i }}: {{ question.config.labels[i - question.config.min] }}</span>
+        </label>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .rating-options {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 10px;
+    }
+
+    .rating-option {
+        display: block;
+        padding: 8px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .rating-option:hover {
+        background: #f0f0f0;
+    }
+
+    .rating-option input[type="radio"] {
+        margin-right: 10px;
+    }
+
+    .rating-label {
+        font-size: 1em;
+        color: #333;
+    }
+</style> 

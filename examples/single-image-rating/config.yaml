@@ -1,0 +1,90 @@
+version: "1.0"
+
+config:
+  title: "Cultural Relevance Rating"
+  description: "Please rate how relevant each image is to the specified culture and concept."
+  version: "1.0.0"
+
+input:
+  type: "single_image"
+  iterator:
+    type: "composed"
+    config:
+      base_url: "https://storage.googleapis.com/image-cultural-evaluation"
+      pattern: "{base_url}/{image_source}/{concept}/{country}/image_0.jpg"
+      iterators:
+        concept:
+          type: "string_list"
+          values: [
+            "breakfast", "clothing", "dance", "dessert", "dinner", "drinks", 
+            "eating habits", "farming", "festival", "funeral", "greetings", 
+            "head coverings", "instrument", "lunch", "marriage", "music",
+            "religion", "sport", "transport"
+          ]
+        country:
+          type: "string_list"
+          values: [
+            "China", "India", "United States", "Brazil", "Nigeria", 
+            "Russia", "Mexico", "Egypt", "Germany", "Indonesia"
+          ]
+      randomize: true
+    variables:
+      image_source: "FLUX-country"
+
+display:
+  type: "single_image"
+  config:
+    image_size: "max-width: 600px"
+    image_position: "top"
+    container_width: "800px"
+    background_color: "#ffffff"
+
+questions:
+  - id: "cultural_relevance"
+    type: "rating"
+    text: "How relevant is this image of {concept} to {country}?"
+    required: true
+    config:
+      display_type: "scantron"
+      show_labels: true
+      min: 1
+      max: 5
+      step: 1
+      labels:
+        - "Not relevant at all"
+        - "Minimally relevant"
+        - "Somewhat relevant"
+        - "Relevant"
+        - "Highly relevant"
+
+  - id: "cultural_accuracy"
+    type: "rating"
+    text: "How accurately does this depiction of {concept} represent {country}?"
+    required: true
+    config:
+      display_type: "scantron"
+      show_labels: true
+      min: 1
+      max: 5
+      step: 1
+      labels:
+        - "Very inaccurate"
+        - "Somewhat inaccurate"
+        - "Neutral"
+        - "Somewhat accurate"
+        - "Very accurate"
+
+layout:
+  type: "single_page"
+  config:
+    question_spacing: "20px"
+
+output:
+  format: "csv"
+  fields:
+    - "timestamp"
+    - "concept"
+    - "country"
+    - "question_id"
+    - "rating"
+    - "annotator_id" 

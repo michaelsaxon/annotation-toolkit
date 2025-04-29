@@ -1,0 +1,60 @@
+<div class="question-container" data-question-id="{{ question.id }}">
+    <h3>{{ question.text }}</h3>
+    <div class="rating-container">
+        <input type="range" 
+               id="rating-{{ question.id }}"
+               min="{{ question.config.min }}"
+               max="{{ question.config.max }}"
+               step="{{ question.config.step }}"
+               value="{{ question.config.min }}"
+               {% if question.required %}required{% endif %}>
+        <span id="rating-value-{{ question.id }}">{{ question.config.min }}</span>
+    </div>
+    {% if question.config.labels %}
+    <div class="rating-labels">
+        {% for label in question.config.labels %}
+        <div class="label-slot"><span>{{ label }}</span></div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .rating-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .rating-container input[type="range"] {
+        flex: 1;
+    }
+
+    .rating-labels {
+        display: grid;
+        grid-template-columns: repeat({{ question.config.labels|length }}, 1fr);
+        width: 100%;
+        margin-top: 5px;
+        padding: 0 8px;  /* Align with slider ends */
+    }
+
+    .label-slot {
+        text-align: center;
+        font-size: 0.9em;
+        color: #666;
+    }
+
+    .label-slot span {
+        display: inline-block;
+        max-width: 100%;  /* Ensure text wraps if needed */
+        word-wrap: break-word;
+    }
+</style>
+
+<script>
+    // Update rating value display
+    document.getElementById('rating-{{ question.id }}').addEventListener('input', (e) => {
+        document.getElementById('rating-value-{{ question.id }}').textContent = e.target.value;
+    });
+</script> 
